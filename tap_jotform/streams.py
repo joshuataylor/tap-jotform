@@ -275,6 +275,7 @@ class UserHistory(JotformStream):
                 "reportCreated",
                 "reportUpdated",
                 "submissionDeleteAll",
+                "workflowUpdated"
             ],
         ),
         th.Property("username", th.StringType),
