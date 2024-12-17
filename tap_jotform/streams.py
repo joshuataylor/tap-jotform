@@ -169,10 +169,21 @@ class SubmissionsStream(JotformPaginatedStream):
                     th.Property("qid", th.StringType, required=True),
                     th.Property("answer", th.StringType),
                     th.Property("text", th.StringType),
-                    th.Property("order", th.StringType),
+                    th.Property("countryCode", th.StringType),
+                    th.Property("inputMask", th.StringType),
+                    th.Property("inputMaskValue", th.StringType),
+                    # th.Property("sublabels", th.ObjectType()),
+                    th.Property("timeFormat", th.StringType),
                     th.Property("type", th.StringType),
                     th.Property("name", th.StringType),
+                    th.Property("order", th.StringType),
                     th.Property("prettyFormat", th.StringType()),
+                    th.Property("cfname", th.StringType),
+                    th.Property("maxValue", th.StringType),
+                    th.Property("selectedField", th.StringType),
+                    th.Property("static", th.BooleanType),
+                    th.Property("stars", th.IntegerType),
+                    th.Property("starStyle", th.StringType),
                 ),
             ),
         ),
@@ -191,16 +202,53 @@ class SubmissionsStream(JotformPaginatedStream):
         row = super().post_process(row, context)
 
         answers_list = []
-        answers: dict[str, dict[str, str | None]] = row.pop("answers", {})
+        answers: dict[str, dict[str, str | int | None]] = row.pop("answers", {})
         for qid, entry in answers.items():
             answer = entry.get("answer")
             entry["answer"] = json.dumps(answer) if answer is not None else None
-            value: dict[str, str | None] = {"qid": qid, **entry}
+            entry["order"] = string_to_integer(entry.get("order", None))
+            entry['static'] = string_to_boolean(entry.get("static", None))
+            entry['stars'] = string_to_integer(entry.get("stars", None))
+
+            value: dict[str, str | int | bool | None] = {"qid": qid, **entry}
             answers_list.append(value)
         row["answers"] = answers_list
 
         return row
 
+def string_to_integer(value: t.Optional[str]) -> int | None:
+    """Convert a string to an integer.
+
+    Args:
+        value: The string value to convert.
+
+    Returns:
+        The integer value, or None if the string is not a valid integer.
+    """
+    if value is None:
+        return None
+    try:
+        return int(value)
+    except ValueError:
+        return None
+
+def string_to_boolean(value: t.Optional[str]) -> bool | None:
+    """Convert a string to a boolean.
+
+    Args:
+        value: The string value to convert.
+
+    Returns:
+        The boolean value, or None if the string is not a valid boolean.
+    """
+    if value is None:
+        return None
+    if value.lower() == "yes":
+        return True
+    elif value.lower() == "no":
+        return False
+    else:
+        return None
 
 class ReportsStream(JotformStream):
     """Reports stream."""
