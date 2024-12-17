@@ -168,6 +168,11 @@ class SubmissionsStream(JotformPaginatedStream):
                 th.ObjectType(
                     th.Property("qid", th.StringType, required=True),
                     th.Property("answer", th.StringType),
+                    th.Property("text", th.StringType),
+                    th.Property("order", th.StringType),
+                    th.Property("type", th.StringType),
+                    th.Property("name", th.StringType),
+                    th.Property("prettyFormat", th.StringType()),
                 ),
             ),
         ),
@@ -275,7 +280,11 @@ class UserHistory(JotformStream):
                 "reportCreated",
                 "reportUpdated",
                 "submissionDeleteAll",
-                "workflowUpdated"
+                "workflowUpdated",
+                "workflowCreated",
+                "notification",
+                "submissionPurge",
+                "submissionDelete"
             ],
         ),
         th.Property("username", th.StringType),
